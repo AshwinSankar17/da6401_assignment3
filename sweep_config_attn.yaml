@@ -1,0 +1,54 @@
+program: train.py
+method: bayes # Or random, grid
+metric:
+  name: val/acc
+  goal: maximize
+
+parameters:
+  # Model Architecture
+  input_embed_dim:
+    values: [32, 64, 128]
+  target_embed_dim: # Often same as input_embed_dim
+    values: [32, 64, 128]
+  hidden_dim: # Used for both encoder and decoder hidden_dim
+    values: [64, 128, 256]
+  num_encoder_layers: # Used for both encoder and decoder number of layers
+    values: [1, 2, 3]
+  num_decoder_layers: # Used for both encoder and decoder number of layers
+    values: [1, 2, 3]
+  rnn_cell_type:
+    values: ["RNN", "GRU", "LSTM"] # RNN is often too slow/ineffective
+  dropout:
+    distribution: uniform
+    min: 0.1
+    max: 0.5
+  encoder_bidirectional:
+    values: [true, false]
+  
+  # Attention (if used)
+  attention_type:
+    values: ["bahdanau"]
+  attention_dim: # Only relevant if attention_type is bahdanau
+    values: [32, 64, 128]
+
+  # Training Hyperparameters
+  learning_rate:
+    distribution: log_uniform_values
+    min: 0.0001
+    max: 0.01
+  batch_size:
+    values: [64, 128, 256] # Adjust based on GPU memory
+  teacher_forcing_ratio:
+    distribution: uniform
+    min: 0.2
+    max: 0.8
+  grad_clip_val:
+    values: [0.0, 1.0, 5.0] # 0.0 means no clipping
+  label_smoothing:
+    distribution: uniform
+    min: 0.0
+    max: 0.2
+
+  # Fixed for this sweep run, but can be params too
+  num_epochs:
+    value: 20 # Keep relatively low for sweep speed
